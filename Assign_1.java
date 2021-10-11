@@ -86,8 +86,8 @@ class hospital {
             for(int i=0; i<l; i++) {
                 temp=lst.get(i);
                 if(temp.getQuan()!=0 && temp.getDay()>=d) {
+                    System.out.println(count+"-> "+"Day: "+temp.getDay()+ " Available Qty: "+temp.getQuan()+" Vaccine: "+ temp.getType());
                     count++;
-                    System.out.println(i+"-> "+"Day: "+temp.getDay()+ " Available Qty: "+temp.getQuan()+" Vaccine: "+ temp.getType());
                 }
             }
             if(count==0) {
@@ -105,8 +105,8 @@ class hospital {
                 temp=lst.get(i);
                 // System.out.println("Something: "+ temp.getQuan()+ " "+ temp.getDay()+" "+ d);
                 if(temp.getType().equals(str) && temp.getQuan()!=0 && temp.getDay()>=d) {
+                    System.out.println(count+"-> "+"Day: "+temp.getDay()+ " Available Qty: "+temp.getQuan()+" Vaccine: "+ temp.getType());
                     count++;
-                    System.out.println(i+"-> "+"Day: "+temp.getDay()+ " Available Qty: "+temp.getQuan()+" Vaccine: "+ temp.getType());
                 }
             }
             if(count==0) {
@@ -471,9 +471,12 @@ public class Assign_1 {
                                 rt_slot=temp.disp_sell(cit_stat, cit_vacc, cit_temp.getDueDate());
                                 break;
                             }
+                            if(i==l-1) {
+                                temp=null;
+                            }
                         }
 
-                        if(rt_slot==1) {
+                        if(temp!=null && rt_slot==1) {
                             System.out.println("Choose Slot: ");
                             int ch_3= scan.nextInt();
                             slot temp_slot= temp.slot_upd(ch_3, cit_stat, cit_vacc, cit_temp.getDueDate());
@@ -509,66 +512,81 @@ public class Assign_1 {
                     else if(ch_2==2) {              //Searching by Vaccine
                         System.out.println("Enter Vaccine name: ");
                         String vacc_name= scan.next();
+                        if(cit_temp.getStatus()>0 && cit_temp.getVac().getName()!=vacc_name) {
+                            System.out.println("Vaccine mixing is dangerous");
+                        }
 
-                        int l_hosp= hosp.size();
-                        hospital temp_hosp= null;
-                        ArrayList<hospital> lst_hosp= new ArrayList<hospital>();
+                        else {
+                            int l_hosp= hosp.size();
+                            hospital temp_hosp= null;
+                            ArrayList<hospital> lst_hosp= new ArrayList<hospital>();
 
-                        for(int i=0;i<l_hosp;i++) {
-                            temp_hosp= hosp.get(i);                     //Continue from here
-                            if(temp_hosp.slot_vacc(vacc_name)==true) {
-                                lst_hosp.add(temp_hosp);
+                            for(int i=0;i<l_hosp;i++) {
+                                temp_hosp= hosp.get(i);                     //Continue from here
+                                if(temp_hosp.slot_vacc(vacc_name)==true) {
+                                    lst_hosp.add(temp_hosp);
+                                }
                             }
-                        }
 
-                        int l_ch= lst_hosp.size();
-                        for(int i=0;i<l_ch;i++) {
-                            temp_hosp=lst_hosp.get(i);
-                            System.out.println(temp_hosp.getName()+" "+temp_hosp.getId());
-                        }
+                            int l_ch= lst_hosp.size();
+                            if(l_ch>0) {
+                                for(int i=0;i<l_ch;i++) {
+                                    temp_hosp=lst_hosp.get(i);
+                                    System.out.println(temp_hosp.getName()+" "+temp_hosp.getId());
+                                }
 
-                        System.out.println("Enter hospital id: ");
-                        int id_ch= scan.nextInt();
-                        for(int i=0;i<l_ch;i++) {
-                            temp_hosp=lst_hosp.get(i);
-                            // System.out.println("ID Comp: " + temp_hosp.getId()+" "+ id_ch);
-                            if(temp_hosp.getId()==id_ch) {
-                                break;
-                            }
-                        }
-
-                        // System.out.println("hello: "+ cit_temp.getDueDate());
-                        int rt_slot=temp_hosp.disp_sell(1, vacc_name, cit_temp.getDueDate());
-                        // System.out.println("hello: "+rt_slot);
-                        if(rt_slot==1) {
-                            System.out.println("Choose Slot: ");
-                            int ch_3= scan.nextInt();
-                            slot temp_slot= temp_hosp.slot_upd(ch_3, cit_stat, cit_vacc, cit_temp.getDueDate());
-
-                            if(temp_slot!=null) {
-                                vaccines temp_vac=null;
-                                int l_vac= vacc.size();
-                                for(int i=0; i<l_vac; i++) {
-                                    temp_vac=vacc.get(i);
-                                    if(temp_vac.getName().equals(temp_slot.getType())) {
+                                System.out.println("Enter hospital id: ");
+                                int id_ch= scan.nextInt();
+                                for(int i=0;i<l_ch;i++) {
+                                    temp_hosp=lst_hosp.get(i);
+                                    // System.out.println("ID Comp: " + temp_hosp.getId()+" "+ id_ch);
+                                    if(temp_hosp.getId()==id_ch) {
                                         break;
+                                    }
+                                    if(i==l_ch-1) {
+                                        System.out.println("No such hospital found!");
+                                        temp_hosp=null;
                                     }
                                 }
 
-                                if(cit_temp.getStatus()==0) {
-                                    cit_temp.setStatus(cit_temp.getStatus()+1);
-                                    cit_temp.setVac(temp_vac);
-                                    cit_temp.setDueDate(temp_slot.getDay()+temp_vac.getGap());
+                                if (temp_hosp!=null) {
+                                    // System.out.println("hello: "+ cit_temp.getDueDate());
+                                    int rt_slot=temp_hosp.disp_sell(1, vacc_name, cit_temp.getDueDate());
+                                    // System.out.println("hello: "+rt_slot);
+                                    if(rt_slot==1) {
+                                        System.out.println("Choose Slot: ");
+                                        int ch_3= scan.nextInt();
+                                        slot temp_slot= temp_hosp.slot_upd(ch_3, cit_stat, cit_vacc, cit_temp.getDueDate());
+
+                                        if(temp_slot!=null) {
+                                            vaccines temp_vac=null;
+                                            int l_vac= vacc.size();
+                                            for(int i=0; i<l_vac; i++) {
+                                                temp_vac=vacc.get(i);
+                                                if(temp_vac.getName().equals(temp_slot.getType())) {
+                                                    break;
+                                                }
+                                            }
+
+                                            if(cit_temp.getStatus()==0) {
+                                                cit_temp.setStatus(cit_temp.getStatus()+1);
+                                                cit_temp.setVac(temp_vac);
+                                                cit_temp.setDueDate(temp_slot.getDay()+temp_vac.getGap());
+                                            }
+                                            else {
+                                                cit_temp.setStatus(cit_temp.getStatus()+1);
+                                                cit_temp.setDueDate(temp_slot.getDay()+temp_vac.getGap());
+                                            }
+                                            cit_temp.vaccinated();
+                                        }
+                                    }
                                 }
-                                else {
-                                    cit_temp.setStatus(cit_temp.getStatus()+1);
-                                    cit_temp.setDueDate(temp_slot.getDay()+temp_vac.getGap());
-                                }
-                                cit_temp.vaccinated();
+                            }
+                            else {
+                                System.out.println("No slot found!");
                             }
                         }
                     }
-
                     else if(ch_2==3) {
                     }
                 }
